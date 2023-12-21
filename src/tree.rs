@@ -9,6 +9,7 @@ enum RemoveResult<T> {
 pub struct Node<V> {
     value: Option<V>,
     children: Map<Node<V>>,
+    is_catchall: bool,
 }
 
 impl<V> Node<V> {
@@ -31,7 +32,13 @@ impl<V> Node<V> {
     }
 
     pub fn insert<'a>(&mut self, path: impl Iterator<Item = &'a str>, value: V) {
-        let end = path.fold(self, |curr, key| curr.children.insert(key));
+        let end = path.fold(self, |curr, key| {
+            let next = curr.children.insert(key);
+            if key.starts_with("*") {
+                next.is_catchall = true;
+            }
+            next
+        });
         end.value = Some(value);
     }
 
@@ -64,7 +71,9 @@ impl<V> Node<V> {
     }
 
     fn at_impl<'a>(&self, path: &mut impl Iterator<Item = &'a str>) -> Option<&V> {
-        if let Some(child_key) = path.next() {
+        if self.is_catchall {
+            self.value.as_ref()
+        } else if let Some(child_key) = path.next() {
             self.children
                 .matches(child_key)
                 .find_map(|child| child.at_impl(path))
@@ -83,6 +92,7 @@ impl<V> Default for Node<V> {
         Self {
             value: None,
             children: Map::default(),
+            is_catchall: false,
         }
     }
 }
