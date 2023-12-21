@@ -1,0 +1,33 @@
+[package]
+name = "keetree"
+version = "0.0.1"
+edition = "2021"
+
+[dependencies]
+thiserror = "1.0.51"
+itertools = "0.12.0"
+regex = "1.10.2"
+hashbrown = "0.14.3"
+# rkyv = "0.7.43"
+
+[dev-dependencies]
+matchit = "0.7.3"
+color-eyre = "0.6.2"
+criterion = "0.5.1"
+
+[target.'cfg(not(target_env = "msvc"))'.dev-dependencies]
+tikv-jemallocator = "0.5.4"
+
+[profile.release]
+opt-level = 3
+lto = true
+
+[profile.bench]
+opt-level = 3
+debug = true
+lto = true
+codegen-units = 1
+
+[[bench]]
+name = "bench"
+harness = false
