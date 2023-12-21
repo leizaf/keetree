@@ -1,7 +1,7 @@
 # `keetree` (WIP)
 
-[![Version](https://img.shields.io/crates/v/matchit?style=for-the-badge)](https://crates.io/crates/keetree)
-[![License](https://img.shields.io/crates/l/matchit?style=for-the-badge)](https://crates.io/crates/keetree)
+[![Version](https://img.shields.io/crates/v/keetree?style=for-the-badge)](https://crates.io/crates/keetree)
+[![License](https://img.shields.io/crates/l/keetree?style=for-the-badge)](https://crates.io/crates/keetree)
 
 A lightweight and fast router with no_std support. The main library comes in at **182** lines only.
 
