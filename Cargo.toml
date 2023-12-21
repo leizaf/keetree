@@ -2,6 +2,8 @@
 name = "keetree"
 version = "0.0.1"
 edition = "2021"
+description = "A lightweight and fast router with no_std support."
+license-file = "LICENSE"
 categories = ["network-programming", "algorithms"]
 keywords = ["router", "path", "tree"]
 repository = "https://github.com/leifu1128/keetree"
