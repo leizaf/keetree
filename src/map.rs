@@ -1,4 +1,7 @@
-use std::iter::once;
+use alloc::borrow::ToOwned;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::iter::once;
 
 use hashbrown::HashMap;
 use regex::Regex;

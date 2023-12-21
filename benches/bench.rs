@@ -1,10 +1,4 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-#[cfg(not(target_env = "msvc"))]
-use tikv_jemallocator::Jemalloc;
-
-#[cfg(not(target_env = "msvc"))]
-#[global_allocator]
-static GLOBAL: Jemalloc = Jemalloc;
 
 macro_rules! register {
     (normal) => {
@@ -155,41 +149,44 @@ macro_rules! register {
     }};
 }
 
-fn call() -> impl IntoIterator<Item = &'static str> {
-    [
-        "/user/repos",
-        "/repos/rust-lang/rust/stargazers",
-        "/orgs/rust-lang/public_members/nikomatsakis",
-        "/repos/rust-lang/rust/releases/1.51.0",
-    ]
+fn call() -> impl IntoIterator<Item=&'static str> {
+	[
+		"/user/repos",
+		"/repos/rust-lang/rust/stargazers",
+		"/orgs/rust-lang/public_members/nikomatsakis",
+		"/repos/rust-lang/rust/releases/1.51.0",
+	]
 }
 
 fn compare_router_match(c: &mut Criterion) {
-    let mut group = c.benchmark_group("Compare Router Match");
+	let mut group = c.benchmark_group("Compare Router Match");
 
-    let mut router = matchit::Router::new();
-    for route in register!(colon) {
-        router.insert(route, ()).unwrap();
-    }
-    group.bench_function("matchit", |b| {
-        b.iter(|| {
-            for route in black_box(call()) {
-                router.at(route).unwrap();
-            }
-        });
-    });
+	let mut router = matchit::Router::new();
+	for route in register!(colon) {
+		router.insert(route, ()).unwrap();
+	}
+	group.bench_function("matchit", |b| {
+		b.iter(|| {
+			for route in black_box(call()) {
+				router.at(route).unwrap();
+			}
+		});
+	});
 
-    let mut router = keetree::Node::new();
-    for route in register!(colon) {
-        router.insert(route, ()).unwrap();
-    }
-    group.bench_function("keetree", |b| {
-        b.iter(|| {
-            for route in black_box(call()) {
-                router.match_route(route).unwrap().unwrap();
-            }
-        });
-    });
+	fn parse(route: &str) -> impl Iterator<Item=&str> {
+		route.trim_start_matches('/').split('/')
+	}
+	let mut router = keetree::Node::default();
+	for route in register!(colon) {
+		router.insert(parse(route), ())
+	}
+	group.bench_function("keetree", |b| {
+		b.iter(|| {
+			for route in black_box(call()) {
+				router.at(parse(route)).unwrap();
+			}
+		});
+	});
 }
 
 criterion_group!(benches, compare_router_match);
